@@ -4,9 +4,9 @@ import React, { useEffect, useState } from "react";
 function App() {
   const baseURL = "https://bbva20220828000830.azurewebsites.net/api";
   const PIbaseURL = "https://human-detector-test.herokuapp.com/detect";
-  const [offices, setOffices] = useState(Array);
-  const [office, setOffice] = useState(Object);
-  const [CustomersOut, setCustomerOut] = useState(String);
+  const [offices, setOffices] = useState([]);
+  const [office, setOffice] = useState({});
+  const [CustomersOut, setCustomerOut] = useState(0);
 
   useEffect(() => {
     fetch(`${baseURL}/Office`)
@@ -14,7 +14,7 @@ function App() {
       .then((data) => setOffices(data));
   }, []);
 
-  const encodeImageFileAsURL = async (element) => {
+  const encodeImageFileAsURL = (element) => {
     var file = element.files[0];
     var reader = new FileReader();
     reader.onloadend = function () {
@@ -25,7 +25,7 @@ function App() {
       };
       fetch(`${PIbaseURL}`, requestOptions)
         .then((response) => response.json())
-        .then((data) => setCustomerOut(data.n_personas));
+        .then((data) => {setCustomerOut(data.n_personas)});
       console.log(CustomersOut);
     };
     reader.readAsDataURL(file);
@@ -55,7 +55,7 @@ function App() {
             onChange={(e) => setOffice(e.target.value)}
           >
             {offices.map((office) => (
-              <option value={office}>{office.place}</option>
+              <option onSelect={() => setOffice(office)}>{office.place}</option>
             ))}
           </select>
           <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
