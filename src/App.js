@@ -1,19 +1,13 @@
 import "./App.css";
-import React, { useEffect, useRef, useState } from "react";
-import { data } from "autoprefixer";
+import React, { useEffect, useState } from "react";
 
 function App() {
   const baseURL = "https://bbva20220828000830.azurewebsites.net/api";
   const PIbaseURL = "https://human-detector-test.herokuapp.com/detect";
+  const [offices, setOffices] = useState([])
 
-  const [getResult, setGetResult] = useState(null);
-
-  const fortmatResponse = (res) => {
-    return JSON.stringify(res, null, 2);
-  };
-  
   useEffect(() => {
-    fetch(`${baseURL}/Office`).then((response) => console.log(response));
+    fetch(`${baseURL}/Office`).then((response) => response.json()).then((data) => setOffices(data));
   }, []);
 
   return (
@@ -30,7 +24,7 @@ function App() {
             id="countries"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           >
-            <option>prueba</option>
+            {offices.map((office) => (<option value={office.id}>{office.place}</option>))}
           </select>
           <button
             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
