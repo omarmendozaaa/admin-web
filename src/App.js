@@ -6,12 +6,14 @@ import axios from 'axios';
 function App() {
   const baseURL = "https://bbva20220828000830.azurewebsites.net/api";
   const PIbaseURL = "https://human-detector-test.herokuapp.com/detect";
+
   const [offices, setOffices] = useState([])
   const [tickets, setIdTick] = useState([])
   const [idSel, getIdSel] = useState(String)
 
   const now = new Date();
 
+  const [CustomersOut, setCustomerOut] = useState(0);
 
   useEffect(() => {
     fetch(`${baseURL}/Office`).then((response) => response.json()).then((data) => setOffices(data));
@@ -54,9 +56,26 @@ function App() {
     });
   } 
 
-  
-
-
+  const encodeImageFileAsURL = (element) => {
+    var file = element.files[0];
+    var reader = new FileReader();
+    reader.onloadend = function () {
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ base64String: reader.result }),
+      };
+      fetch(`${PIbaseURL}`, requestOptions)
+        .then((response) => response.json())
+        .then((data) => {setCustomerOut(data.n_personas)});
+      console.log(CustomersOut);
+    };
+    reader.readAsDataURL(file);
+    const requestOptionsOffice = {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ latitude: office.latitude, longitude: office.longitude, cantidadAfuera: CustomersOut }),
+    }
   return (
     <div className="App">
       <header className="App-header">
