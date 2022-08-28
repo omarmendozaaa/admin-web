@@ -4,10 +4,9 @@ import React, { useEffect, useState } from "react";
 function App() {
   const baseURL = "https://bbva20220828000830.azurewebsites.net/api";
   const PIbaseURL = "https://human-detector-test.herokuapp.com/detect";
-  const [offices, setOffices] = useState([]);
-  const [office, setOffice] = useState({});
-  const [img64, setimg64] = useState("");
-  const [CustomersOut, setCustomerOut] = useState("");
+  const [offices, setOffices] = useState(Array);
+  const [office, setOffice] = useState(Object);
+  const [CustomersOut, setCustomerOut] = useState(String);
 
   useEffect(() => {
     fetch(`${baseURL}/Office`)
@@ -15,30 +14,27 @@ function App() {
       .then((data) => setOffices(data));
   }, []);
 
-  const encodeImageFileAsURL = (element) => {
+  const encodeImageFileAsURL = async (element) => {
     var file = element.files[0];
     var reader = new FileReader();
     reader.onloadend = function () {
-      console.log(reader.result);
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ base64String: reader.result }),
+      };
+      fetch(`${PIbaseURL}`, requestOptions)
+        .then((response) => response.json())
+        .then((data) => setCustomerOut(data.n_personas));
+      console.log(CustomersOut);
     };
     reader.readAsDataURL(file);
-    setimg64(reader.result);
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ base64String: CustomersOut }),
-    };
-    fetch(`${PIbaseURL}`, requestOptions)
-      .then((response) => response.json())
-      .then((data) => setCustomerOut(data.n_personas));
-    console.log(CustomersOut);
-
     const requestOptionsOffice = {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ latitude: office.latitude, longitude: office.longitude, cantidadAfuera: CustomersOut }),
     }
-    
+
     fetch(`${baseURL}/Office`, requestOptionsOffice)
       .then((response) => response.json())
       .then((data) => setCustomerOut(data.n_personas));
@@ -90,7 +86,6 @@ function App() {
             class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
             for="user_avatar"
           >
-            {img64}
           </label>
         </div>
       </header>
