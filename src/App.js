@@ -35,7 +35,24 @@ function App() {
     .catch(function (error) {
       console.log(error);
     });
-  }  
+  } 
+  
+  const updTicks = (element) => {
+    axios.post(`${baseURL}/Ticket`, {
+      Id: 5,
+      state: 1,
+      updatedTime: now.toISOString(),
+
+    })
+    .then(function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  } 
+
+  
 
 
   return (
