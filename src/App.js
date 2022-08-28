@@ -7,23 +7,24 @@ function App() {
   const baseURL = "https://bbva20220828000830.azurewebsites.net/api";
   const PIbaseURL = "https://human-detector-test.herokuapp.com/detect";
   const [offices, setOffices] = useState([])
-  const [idSel, getIdSel] = useState("")
+  const [tickets, setIdTick] = useState([])
+  const [idSel, getIdSel] = useState(String)
 
   const now = new Date();
 
 
   useEffect(() => {
     fetch(`${baseURL}/Office`).then((response) => response.json()).then((data) => setOffices(data));
+    fetch(`${baseURL}/Ticket/last`).then((response) => response.json()).then((data) => setIdTick(data));
   }, []);
 
   const postTicks = (element) => {
-    axios.post(`${baseURL}/Ticket`, {
-      OfficeId: idSel,
-      CanalAtencion: Math.floor(Math.random()*2),
+    axios.post(`${baseURL}/ticket`, {
+      officeId: idSel,
+      canalAtencion: Math.floor(Math.random()*2),
       userId:Math.floor(Math.random() * (15 - 27 + 1) + 15),
       state: 1,
       createdTime: now.toISOString(),
-
     })
     .then(function (response) {
       console.log(response);
@@ -34,10 +35,15 @@ function App() {
   } 
   
   const updTicks = (element) => {
-    axios.post(`${baseURL}/Ticket`, {
-      Id: 5,
-      state: 1,
-      updatedTime: now.toISOString(),
+    console.log(tickets)
+    axios.put(`${baseURL}/Ticket`, {
+      Id: tickets.id,
+      State: 0,
+      OfficeId: tickets.officeId,
+      CanalAtencion: tickets.canalAtencion,
+      UserId: tickets.userId,
+      CreatedTime: tickets.createdTime,
+      UpdatedTime: now.toISOString(),
 
     })
     .then(function (response) {
@@ -74,7 +80,9 @@ function App() {
           >
             Agregar
           </button>
-          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          <button 
+          onClick={updTicks}
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
             Atender
           </button>
 
