@@ -4,12 +4,45 @@ import React, { useEffect, useState } from "react";
 function App() {
   const baseURL = "https://bbva20220828000830.azurewebsites.net/api";
   const PIbaseURL = "https://human-detector-test.herokuapp.com/detect";
-  const [offices, setOffices] = useState([])
+  const [offices, setOffices] = useState([]);
+  const [office, setOffice] = useState({});
+  const [img64, setimg64] = useState("");
+  const [CustomersOut, setCustomerOut] = useState("");
 
   useEffect(() => {
-    fetch(`${baseURL}/Office`).then((response) => response.json()).then((data) => setOffices(data));
+    fetch(`${baseURL}/Office`)
+      .then((response) => response.json())
+      .then((data) => setOffices(data));
   }, []);
 
+  const encodeImageFileAsURL = (element) => {
+    var file = element.files[0];
+    var reader = new FileReader();
+    reader.onloadend = function () {
+      console.log(reader.result);
+    };
+    reader.readAsDataURL(file);
+    setimg64(reader.result);
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ base64String: CustomersOut }),
+    };
+    fetch(`${PIbaseURL}`, requestOptions)
+      .then((response) => response.json())
+      .then((data) => setCustomerOut(data.n_personas));
+    console.log(CustomersOut);
+
+    const requestOptionsOffice = {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ latitude: office.latitude, longitude: office.longitude, cantidadAfuera: CustomersOut }),
+    }
+    
+    fetch(`${baseURL}/Office`, requestOptionsOffice)
+      .then((response) => response.json())
+      .then((data) => setCustomerOut(data.n_personas));
+  };
   return (
     <div className="App">
       <header className="App-header">
@@ -23,12 +56,13 @@ function App() {
           <select
             id="countries"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            onChange={(e) => setOffice(e.target.value)}
           >
-            {offices.map((office) => (<option value={office.id}>{office.place}</option>))}
+            {offices.map((office) => (
+              <option value={office}>{office.place}</option>
+            ))}
           </select>
-          <button
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
+          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
             Agregar
           </button>
           <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
@@ -46,6 +80,7 @@ function App() {
             aria-describedby="user_avatar_help"
             id="user_avatar"
             type="file"
+            onChange={(e) => encodeImageFileAsURL(e.target)}
           ></input>
           <div
             class="mt-1 text-sm text-gray-500 dark:text-gray-300"
@@ -55,7 +90,7 @@ function App() {
             class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
             for="user_avatar"
           >
-            prueba
+            {img64}
           </label>
         </div>
       </header>
