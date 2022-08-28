@@ -16,10 +16,6 @@ function App() {
     fetch(`${baseURL}/Office`).then((response) => response.json()).then((data) => setOffices(data));
   }, []);
 
-  useEffect(() => {
-    fetch(`${baseURL}/Ticket`).then((response) => response.json()).then((data) => setOffices(data));
-  }, []);
-
   const postTicks = (element) => {
     axios.post(`${baseURL}/Ticket`, {
       OfficeId: idSel,
