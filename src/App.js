@@ -1,14 +1,42 @@
 import "./App.css";
 import React, { useEffect, useState } from "react";
+import axios from 'axios';
+
 
 function App() {
   const baseURL = "https://bbva20220828000830.azurewebsites.net/api";
   const PIbaseURL = "https://human-detector-test.herokuapp.com/detect";
   const [offices, setOffices] = useState([])
+  const [idSel, getIdSel] = useState("")
+
+  const now = new Date();
+
 
   useEffect(() => {
     fetch(`${baseURL}/Office`).then((response) => response.json()).then((data) => setOffices(data));
   }, []);
+
+  useEffect(() => {
+    fetch(`${baseURL}/Ticket`).then((response) => response.json()).then((data) => setOffices(data));
+  }, []);
+
+  const postTicks = (element) => {
+    axios.post(`${baseURL}/Ticket`, {
+      OfficeId: idSel,
+      CanalAtencion: Math.floor(Math.random()*2),
+      userId:Math.floor(Math.random() * (15 - 27 + 1) + 15),
+      state: 1,
+      createdTime: now.toISOString(),
+
+    })
+    .then(function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }  
+
 
   return (
     <div className="App">
@@ -22,11 +50,13 @@ function App() {
           </label>
           <select
             id="countries"
+            onChange={(e) =>getIdSel(e.target.value)}
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           >
             {offices.map((office) => (<option value={office.id}>{office.place}</option>))}
           </select>
           <button
+            onClick= {postTicks}
             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           >
             Agregar
